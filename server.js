@@ -7,15 +7,16 @@ const POKEDEX = require('./pokedex.json');
 
 const app = express();
 
-app.use(morgan('dev'));
+const morganSetting = process.env.NODE_ENV = 'production' ? 'tiny' : 'dev'
+app.use(morgan(morganSetting))
 app.use(cors());
 app.use(helmet());
 
 //middleware prior to the get functions
 app.use(function validateBearerToken(req, res, next) {
-    console.log('validate bear token middleware')
     const authToken = req.get('Authorization');
     const apiToken = process.env.API_TOKEN;
+    
 
     if(!authToken || authToken.split(' ')[1] !== apiToken) {
         return res.status(401).json({ error: 'Unauthorized request' });
@@ -56,10 +57,20 @@ app.get('/types', handleGetTypes)
 
 app.get('/pokemon', handleGetPokemon)
 
-const PORT = 8000
+app.use((error, req, res, next) => {
+    let response
+    if (process.env.NODE_ENV === 'proudction') {
+        response = { error: { message: 'server error' }}
+    } else {
+        response = { error }
+    }
+    response.status(500).json(response)
+})
+
+const PORT = process.env.PORT || 8000
 
 app.listen(PORT, () => {
-    console.log(`Server listening at http://localhost:${PORT}`)
+    /* console.log(`Server listening at http://localhost:${PORT}`) */
 });
 
 
