@@ -24,5 +24,8 @@
     "mocha": "^6.1.4",
     "nodemon": "^1.19.0",
     "supertest": "^4.0.2"
+  },
+  "engines": {
+    "node": "10.15.1"
   }
 }
